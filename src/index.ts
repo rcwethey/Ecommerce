@@ -3,10 +3,11 @@ import { createConnection } from 'typeorm';
 import { corsConfig } from "./Config/corsConfig";
 import express from 'express';
 import { PORT } from './Config/config.json';
-import { buildSchema } from "type-graphql";
-import { ApolloServer } from 'apollo-server-express';
+import { buildTypeDefsAndResolvers } from "type-graphql";
+import { ApolloServer, makeExecutableSchema } from 'apollo-server-express';
 import { sessionConfig } from './Config/sessionConfig';
-import { Resolvers } from './resolvers';
+import { Resolvers } from './resolvers/index';
+import { typeDefs } from './resolvers/typeDefs'
 
 /**
   * Needs - connect to a Database 🔥
@@ -26,7 +27,10 @@ const main = async () => {
   }).catch((error: any) => console.log(error));
 
   const app = express();
-  const schema = await buildSchema({ resolvers: [Resolvers] })
+
+  //Replace "Resolvers" with actual Resolver in an Array 
+  const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({ resolvers: ["Resolvers"] })
+  const schema = makeExecutableSchema({ typeDefs, resolvers })
   const server = new ApolloServer({ schema, context: ({ req }: any) => ({ req }) })
   app.use(corsConfig, sessionConfig)
   server.applyMiddleware({ app })

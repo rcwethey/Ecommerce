@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 .env/
+.json/
 node_modules/
 build/
 tmp/
